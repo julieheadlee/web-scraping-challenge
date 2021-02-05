@@ -12,112 +12,122 @@ def init_browser():
 # 
 def scrape():
 
-# Define dictionary to return all the data from this 
-mars_scrape = {}
-# URL of page to be scraped
-news_url = 'https://mars.nasa.gov/news/?page=0&per_page=40&order=publish_date+desc%2Ccreated_at+desc&search=&category=19%2C165%2C184%2C204&blank_scope=Latest'
+    # Define dictionary to return all the data from this 
+    mars_scrape = {}
+    # URL of page to be scraped
+    news_url = 'https://mars.nasa.gov/news/?page=0&per_page=40&order=publish_date+desc%2Ccreated_at+desc&search=&category=19%2C165%2C184%2C204&blank_scope=Latest'
 
-# Retrieve page with the splinter
-#response = requests.get(url)
-browser = init_browser()
-browser.visit(news_url)
-html = browser.html
-time.sleep(10)  # sleep until you know it is loaded
-# Create BeautifulSoup object; parse with 'html.parser'
-news_soup = bs(html, 'html.parser')
+    # Retrieve page with the splinter
+    browser = init_browser()
+    browser.visit(news_url)
+    html = browser.html
+    time.sleep(10)  # sleep until you know it is loaded
+    
+    # Create BeautifulSoup object; parse with 'html.parser'
+    news_soup = bs(html, 'html.parser')
 
-# Collect the latest News Title and Paragraph Text
-# pull back first news title on page
-results = news_soup.find('li', class_='slide')
-results
-# try and error surrounding looking for the requested items
-for result in results:
-    # Error handling
-    try:
-        # Identify and return title of news article
-        news_title = result.find('div', class_='content_title').text.strip()
+    # Collect the latest News Title and Paragraph Text
+    # pull back first news title on page
+    results = news_soup.find('li', class_='slide')
+    
+    # try and error surrounding looking for the requested items
 
-        # Identify and return paragraph text
-        news_p = result.find('div', class_='article_teaser_body').text.strip()
-        print(f'{news_title}: {news_p}')
-    except Exception as e:
-        print(e)
+    news_dict = {}
+    for result in results:
+        # Error handling
+        try:
+            # Identify and return title of news article
+            news_title = result.find('div', class_='content_title').text.strip()
 
-# Visit the Mars Facts webpage here and use Pandas to scrape the table containing facts about the 
-# planet including Diameter, Mass, etc.
+            # Identify and return paragraph text
+            news_p = result.find('div', class_='article_teaser_body').text.strip()
+            print(f'{news_title}: {news_p}')
+            news_dict.update({"news_title": new_title, "news_p": news_p})
+        except Exception as e:
+            print(e)
 
-# URL of page to be scraped
-facts_url = 'https://space-facts.com/mars/'
+    # store to the dictionary
+    mars_scrape.update({news_dict})
+         
+    # Visit the Mars Facts webpage here and use Pandas to scrape the table containing facts about the 
+    # planet including Diameter, Mass, etc.
 
-# Use pandas to return contents of all tables in page
-tables_df = pd.read_html(facts_url)
-tables_df
+    # URL of page to be scraped
+    facts_url = 'https://space-facts.com/mars/'
 
-# Isolate Mars facts table -- first one on page
-facts_df = tables_df[0]
-facts_df
+    # Use pandas to return contents of all tables in page
+    tables_df = pd.read_html(facts_url)
+    
+    # Isolate Mars facts table -- first one on page
+    facts_df = tables_df[0]
+    
+    # Convert Dataframe to html 
+    html_facts = facts_df.to_html()
 
-# Convert Dataframe to html 
-html_facts = facts_df.to_html()
+    # Strip newline characters.
+    html_facts.replace('\n', '')
 
-# Strip newline characters.
-html_facts.replace('\n', '')
+    facts_dict = {"facts": html_facts}
+    mars_scrape.update({facts_dict})
 
-# Mars Hemispheres
+    # Mars Hemispheres
 
-landing_url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
-executable_path = {'executable_path': 'c:\windows\chromedriver'}
-browser = Browser('chrome', **executable_path, headless=False)
-browser.visit(landing_url)
-html = browser.html
-time.sleep(10)  # sleep until you know it is loaded
-# Create BeautifulSoup object; parse with 'html.parser'
-landing_soup = bs(html, 'html.parser')
-
-# Collect the links from the scraped results
-
-hemi_results = landing_soup.find_all('a', class_='itemLink product-item')
-
-links = []
-for link in hemi_results:
-    full_link = link.get('href')
-    links.append(full_link)
-
-# Make sure you have no duplicates
-end_links = list(set(links))
-print(end_links)
-
-# click each of the links to the hemispheres in order to find the image url to the full resolution image.
-
-link_start = 'https://astrogeology.usgs.gov'
-hemisphere_image_urls = []
-for link in end_links:
-    # To store the link and title
-    hemi_dict = {}
-    browser = Browser('chrome', **executable_path, headless=True)
-    hemi_url = f"{link_start}{link}"
-    browser.visit(hemi_url)
+    landing_url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    executable_path = {'executable_path': 'c:\windows\chromedriver'}
+    browser = Browser('chrome', **executable_path, headless=False)
+    browser.visit(landing_url)
     html = browser.html
     time.sleep(10)  # sleep until you know it is loaded
 
-    #Save image url string Hemisphere title containing the hemisphere name. Keys: img_url, title
-    image_soup = bs(html, 'html.parser')
-    
-    # Get the title
-    try:
-        title_result = image_soup.find('h2', class_='title').text.strip()
+    # Create BeautifulSoup object; parse with 'html.parser'
+    landing_soup = bs(html, 'html.parser')
 
-    except Exception as e:
-        pass
-    
-    # Get the img
-    try: 
-        image_link = image_soup.find('div', class_='downloads').li.a["href"]
+    # Collect the links from the scraped results
 
-    except:
-        pass
-    hemi_dict.update({"title": title_result, "img_url": image_link})
-    hemisphere_image_urls.append(hemi_dict)
-    hemisphere_image_urls
+    hemi_results = landing_soup.find_all('a', class_='itemLink product-item')
+
+    links = []
+    for link in hemi_results:
+        full_link = link.get('href')
+        links.append(full_link)
+
+    # Make sure you have no duplicates
+    end_links = list(set(links))
+    print(end_links)
+
+    # click each of the links to the hemispheres in order to find the image url to the full resolution image.
+
+    link_start = 'https://astrogeology.usgs.gov'
+    hemisphere_image_urls = []
+    for link in end_links:
+        # To store the link and title
+        hemi_dict = {}
+        browser = Browser('chrome', **executable_path, headless=True)
+        hemi_url = f"{link_start}{link}"
+        browser.visit(hemi_url)
+        html = browser.html
+        time.sleep(10)  # sleep until you know it is loaded
+
+        #Save image url string Hemisphere title containing the hemisphere name. Keys: img_url, title
+        image_soup = bs(html, 'html.parser')
+    
+        # Get the title
+        try:
+            title_result = image_soup.find('h2', class_='title').text.strip()
+
+        except Exception as e:
+            pass
+    
+        # Get the img
+        try: 
+            image_link = image_soup.find('div', class_='downloads').li.a["href"]
+
+        except:
+            pass
+        
+        hemi_dict.update({"title": title_result, "img_url": image_link})
+        hemisphere_image_urls.append(hemi_dict)
+    
+    mars_scrape.update({hemi_dict})
 
     return mars_scrape
