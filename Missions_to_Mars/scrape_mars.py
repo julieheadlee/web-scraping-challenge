@@ -7,7 +7,7 @@ import pandas as pd
 def init_browser():
     # @NOTE: Replace the path with your actual path to the chromedriver
     executable_path = {"executable_path": 'c:\windows\chromedriver'}
-    return Browser("chrome", **executable_path, headless=False)
+    return Browser("chrome", **executable_path, headless=True)
 
 # 
 def scrape():
@@ -20,9 +20,9 @@ def scrape():
     # Retrieve page with the splinter
     
     executable_path = {'executable_path': 'c:\windows\chromedriver'}
-    browser = Browser('chrome', **executable_path, headless=False)
+    browser = Browser('chrome', **executable_path, headless=True)
     browser.visit(news_url)
-    time.sleep(2)  # sleep until you know it is loaded
+    time.sleep(1)  # sleep until you know it is loaded
     html = browser.html
 
     # Create BeautifulSoup object; parse with 'html.parser'
@@ -69,9 +69,9 @@ def scrape():
 
     landing_url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
     executable_path = {'executable_path': 'c:\windows\chromedriver'}
-    browser = Browser('chrome', **executable_path, headless=False)
+    browser = Browser('chrome', **executable_path, headless=True)
     browser.visit(landing_url)
-    time.sleep(2)  # sleep until you know it is loaded
+    time.sleep(1)  # sleep until you know it is loaded
     html = browser.html 
     # Create BeautifulSoup object; parse with 'html.parser'
     landing_soup = bs(html, 'html.parser')
@@ -99,7 +99,7 @@ def scrape():
         hemi_url = f"{link_start}{link}"
         browser.visit(hemi_url)
         html = browser.html
-        time.sleep(2)  # sleep until you know it is loaded
+        time.sleep(1)  # sleep until you know it is loaded
 
         #Save image url string Hemisphere title containing the hemisphere name. Keys: img_url, title
         image_soup = bs(html, 'html.parser')
@@ -109,14 +109,14 @@ def scrape():
             title_result = image_soup.find('h2', class_='title').text.strip()
 
         except Exception as e:
-            pass
+            title_result = ""
     
         # Get the img
         try: 
             image_link = image_soup.find('div', class_='downloads').li.a["href"]
 
         except:
-            pass
+            image_link = ""
         
         hemi_dict.update({"title": title_result, "img_url": image_link})
         hemisphere_image_urls.append(hemi_dict)
