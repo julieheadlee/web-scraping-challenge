@@ -10,7 +10,7 @@
 </head>
 
 <body>
-  {%for dict in mars_info}
+
   <div class="container-fluid">
     <div class="jumbotron text-center">
       <h1>Mission to Mars</h1>
@@ -26,53 +26,47 @@
   <div class="container-fluid">
     <div class="row">
       <br>
-  </div>
-  <div class="row">
-    <h3>Latest Mars News</h3>
-    <div class = "news_title">{{mars_info[0].news_title}}</div>
-    <div class = "news_p">{{mars_info[0].news_title}}</div>
-  </div>
-  <div class="row">
-    <h3>Mars Facts</h3>
-  </div>
-  <div class="row">
-    <div class="col-1">
+    </div>
+    <div class="row">
+      <h3>Latest Mars News</h3>
+      <div class = "news_title">{{info.news_title}}</div>
+      <div class = "news_p">{{info.news_p}}</div>
+    </div>
+    <div class="row">
+      <h3>Mars Facts</h3>
+    </div>
+    <div class="row">
+      <div class="col-1">
         
-    </div>
-    <div class="col-6">
-      <div class="facts_table">
-      {{mars_info[1].facts}}
       </div>
-    
-    <div class="col-3 ">
-      <h4>Visualizations</h4>
-      <hr>
-      <div class="container-fluid">
-        <div class="row">
+      <div class="col-6">
+        <div class="facts_table">
+          {{info.facts}}
+        </div>
+      </div>
+    <div class="row">
+      <div class="col-1">
           
-            <a target="_self" href="maxtemp.html">
-            <img src={{mars_info[2][0].img_src}} alt={{mars_info[2][0].title}}/>
-            </a>
-            <a target="_self" href="humidity.html">
-            <img src={{mars_info[2][1].img_src}} alt={{mars_info[2][1].title}}/>
-            </a>
+      <div class="col-6 ">
+        <h3>Mars Hemispheres</h4>
+        <hr>
+        <div class="container-fluid">
+          <div class="row">
+          
+              <img src={{info.hemis[0].img_src}} alt={{info.hemis[0].title}}/>
+
+              <img src={{info.hemis[1].img_src}} alt={{info.hemis[1].title}}/>
+          
+          </div> 
+          <div class="row">
             
-        </div> 
-        <div class="row">
-            
-            <a target="_self" href="maxtemp.html">
-            <img src={{mars_info[2][2].img_src}} alt={{mars_info[2][2].title}}/>
-            </a>
-            <a target="_self" href="humidity.html">
-            <img src={{mars_info[2][3].img_src}} alt={{mars_info[2][3].title}}/>
-            </a>
-            
-        </div>     
+            <img src={{info.hemis[2].img_src}} alt={{info.hemis[2].title}}/>
+          
+            <img src={{info.hemis[3].img_src}} alt={{info.hemis[3].title}}/>
+
+          </div>     
       </div>
     </div>
-
-  
-  </div>
 
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>

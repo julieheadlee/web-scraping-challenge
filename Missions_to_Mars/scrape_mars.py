@@ -12,17 +12,19 @@ def init_browser():
 # 
 def scrape():
 
-    # Define dictionary to return all the data from this 
     mars_scrape = {}
+
     # URL of page to be scraped
     news_url = 'https://mars.nasa.gov/news/?page=0&per_page=40&order=publish_date+desc%2Ccreated_at+desc&search=&category=19%2C165%2C184%2C204&blank_scope=Latest'
 
     # Retrieve page with the splinter
-    browser = init_browser()
-    browser.visit(news_url)
-    html = browser.html
-    time.sleep(10)  # sleep until you know it is loaded
     
+    executable_path = {'executable_path': 'c:\windows\chromedriver'}
+    browser = Browser('chrome', **executable_path, headless=False)
+    browser.visit(news_url)
+    time.sleep(2)  # sleep until you know it is loaded
+    html = browser.html
+
     # Create BeautifulSoup object; parse with 'html.parser'
     news_soup = bs(html, 'html.parser')
 
@@ -32,7 +34,6 @@ def scrape():
     
     # try and error surrounding looking for the requested items
 
-    news_dict = {}
     for result in results:
         # Error handling
         try:
@@ -42,13 +43,10 @@ def scrape():
             # Identify and return paragraph text
             news_p = result.find('div', class_='article_teaser_body').text.strip()
             print(f'{news_title}: {news_p}')
-            news_dict.update({"news_title": new_title, "news_p": news_p})
+
         except Exception as e:
             print(e)
 
-    # store to the dictionary
-    mars_scrape.update({news_dict})
-         
     # Visit the Mars Facts webpage here and use Pandas to scrape the table containing facts about the 
     # planet including Diameter, Mass, etc.
 
@@ -62,13 +60,10 @@ def scrape():
     facts_df = tables_df[0]
     
     # Convert Dataframe to html 
-    html_facts = facts_df.to_html()
+    facts = facts_df.to_html()
 
     # Strip newline characters.
-    html_facts.replace('\n', '')
-
-    facts_dict = {"facts": html_facts}
-    mars_scrape.update({facts_dict})
+    html_facts = facts.replace('\n', '')
 
     # Mars Hemispheres
 
@@ -76,9 +71,8 @@ def scrape():
     executable_path = {'executable_path': 'c:\windows\chromedriver'}
     browser = Browser('chrome', **executable_path, headless=False)
     browser.visit(landing_url)
-    html = browser.html
-    time.sleep(10)  # sleep until you know it is loaded
-
+    time.sleep(2)  # sleep until you know it is loaded
+    html = browser.html 
     # Create BeautifulSoup object; parse with 'html.parser'
     landing_soup = bs(html, 'html.parser')
 
@@ -93,7 +87,6 @@ def scrape():
 
     # Make sure you have no duplicates
     end_links = list(set(links))
-    print(end_links)
 
     # click each of the links to the hemispheres in order to find the image url to the full resolution image.
 
@@ -106,7 +99,7 @@ def scrape():
         hemi_url = f"{link_start}{link}"
         browser.visit(hemi_url)
         html = browser.html
-        time.sleep(10)  # sleep until you know it is loaded
+        time.sleep(2)  # sleep until you know it is loaded
 
         #Save image url string Hemisphere title containing the hemisphere name. Keys: img_url, title
         image_soup = bs(html, 'html.parser')
@@ -128,6 +121,9 @@ def scrape():
         hemi_dict.update({"title": title_result, "img_url": image_link})
         hemisphere_image_urls.append(hemi_dict)
     
-    mars_scrape.update({hemi_dict})
+    mars_scrape = {'news_title': news_title,
+                    'news_p': news_p, 
+                    'facts': html_facts,
+                    'hemis': hemisphere_image_urls}
 
     return mars_scrape
